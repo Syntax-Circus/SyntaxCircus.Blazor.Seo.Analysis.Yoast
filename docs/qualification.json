@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-15",
+  "qualificationPackageVersion": "0.1.0-local.4",
+  "tests": {
+    "windows": {
+      "core": 19,
+      "client": 10,
+      "node": 4
+    },
+    "linux": {
+      "core": 19,
+      "client": 10,
+      "node": 4
+    },
+    "controlledCorrectionPairs": 7
+  },
+  "browser": {
+    "platform": "Windows Chromium",
+    "checks": 18,
+    "errors": [],
+    "results": [
+      "anonymous API rejected",
+      "server: real Yoast advice",
+      "server: complete companion coverage",
+      "server: active rewrite clears passive finding",
+      "server: editing invalidates pending result",
+      "server: narrow viewport fits",
+      "wasm: real Yoast advice",
+      "wasm: complete companion coverage",
+      "wasm: active rewrite clears passive finding",
+      "wasm: editing invalidates pending result",
+      "wasm: narrow viewport fits",
+      "WASM actually downloaded client assembly",
+      "no Yoast client assembly or script delivered",
+      "server: outage retains core findings",
+      "server: outage coverage explicit",
+      "wasm: outage retains core findings",
+      "wasm: outage coverage explicit",
+      "no browser errors"
+    ]
+  },
+  "corpus": {
+    "documents": 34,
+    "corePreserved": 34,
+    "degradedChecks": 136,
+    "coreFindings": 40,
+    "combinedFindings": 50,
+    "linuxOwnedDocuments": 24,
+    "linuxDegradedChecks": 96
+  },
+  "latency": {
+    "method": "Sequential HTTP requests after service restart; fresh worker per request, not a warm worker pool. Single owned writing fixture; no concurrent-load or production SLO claim.",
+    "requestBytes": 1545,
+    "firstRequestMs": 174.143,
+    "subsequentMedianMs": 190.15194999999994,
+    "subsequentMinMs": 162.24119999999994,
+    "subsequentMaxMs": 202.5752,
+    "requests": [
+      {
+        "milliseconds": 174.143,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 185.92020000000002,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 202.5752,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 193.0457,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 190.59799999999996,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 188.40190000000007,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 186.25369999999998,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 190.90739999999983,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 197.67940000000021,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 162.24119999999994,
+        "responseBytes": 3522
+      },
+      {
+        "milliseconds": 189.70589999999993,
+        "responseBytes": 3522
+      }
+    ]
+  },
+  "dependencies": {
+    "npmVulnerabilities": 0,
+    "yoast": "3.6.0",
+    "wordpressI18nOverride": "6.6.0",
+    "angleSharp": "1.8.5"
+  },
+  "limitations": [
+    "No hosted GitHub Actions, NuGet publication, or container release executed. Core must publish first.",
+    "Actual browser run is Windows; Linux browser CI is configured but not executed locally.",
+    "Measurements are local observations, not accuracy, ranking, concurrency-scale or production SLO claims.",
+    "No legal conclusion for downstream application combinations.",
+    "No Puppies Plus production integration, owner UAT, real phone or assistive-technology qualification."
+  ],
+  "image": {
+    "id": "sha256:55f47aaf04b11237ded00539fc4c66997ebe7375fed873f700546d8c9a38cf32",
+    "bytes": 241219195,
+    "nodeVersion": "NODE_VERSION=24.22.0",
+    "user": "node"
+  },
+  "observedIdleMemoryMiB": [
+    18.5,
+    49.82
+  ],
+  "memoryNote": "Two idle Docker stats samples; not measured peak memory.",
+  "packageBytes": {
+    "core": 25213,
+    "client": 15415
+  }
+}

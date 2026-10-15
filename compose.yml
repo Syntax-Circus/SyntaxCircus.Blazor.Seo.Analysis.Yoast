@@ -1,0 +1,12 @@
+services:
+  yoast:
+    build: ./service
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 384m
+    cpus: 1.0
+    pids_limit: 64
+    tmpfs: ["/tmp:size=8m,noexec,nosuid"]
+    ports: ["127.0.0.1:5088:8080"]

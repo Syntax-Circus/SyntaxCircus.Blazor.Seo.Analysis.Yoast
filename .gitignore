@@ -3,3 +3,6 @@
 artifacts/
 **/node_modules/
 **/test-results/
+nuget.local.config
+service/source/
+artifacts-qualification.json
