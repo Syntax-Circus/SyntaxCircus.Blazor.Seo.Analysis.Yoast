@@ -1,5 +1,11 @@
 # SyntaxCircus.Seo.Analysis.Yoast
 
+[![Build](https://github.com/Syntax-Circus/SyntaxCircus.Seo.Analysis.Yoast/actions/workflows/build.yml/badge.svg)](https://github.com/Syntax-Circus/SyntaxCircus.Seo.Analysis.Yoast/actions/workflows/build.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/Syntax-Circus/SyntaxCircus.Seo.Analysis.Yoast/build.yml?label=tests)](https://github.com/Syntax-Circus/SyntaxCircus.Seo.Analysis.Yoast/actions/workflows/build.yml)
+[![NuGet](https://img.shields.io/nuget/v/SyntaxCircus.Seo.Analysis.Yoast.svg)](https://www.nuget.org/packages/SyntaxCircus.Seo.Analysis.Yoast)
+[![Client: MIT](https://img.shields.io/badge/Client-MIT-yellow.svg)](LICENSE)
+[![Service: GPL-3.0](https://img.shields.io/badge/Service-GPL--3.0-blue.svg)](service/LICENSE)
+
 Optional .NET 10 companion for SyntaxCircus.Seo.Analysis. Runs Yoast in a private Node container; no Yoast code is delivered to browsers.
 
 The original .NET client is MIT. The separately deployed service is GPL-3.0-only and includes dependencies under their own licenses. See [artifact licensing and source distribution](docs/LICENSING.md).
