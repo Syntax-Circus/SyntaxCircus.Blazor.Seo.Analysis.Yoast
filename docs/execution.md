@@ -11,7 +11,7 @@ Approved scope: MIT .NET HTTP client; separately deployed GPL Yoast service; pac
 - Initial npm audit showed three moderate findings. Pinning WordPress i18n6.6.0 removes the affected runtime/sprintf dependencies:final npm audit reports zero. NuGet sample packages use patched Blazor10.0.13 after10.0.12 restore exposed two high advisories.
 - Final review:three Important issues (unbounded nesting, malformed companion results losing baseline, CI dependence on uninstalled RTK) and two Minor issues (missing scores, slash-containing branch filters) addressed. Behavioral fixes have observed RED→GREEN regressions; internal scripts now use standard git/tar/docker. No unresolved Critical/Important findings remain.
 - Workflows parse and match feature branches. Package contents inspected:core25,213 bytes/client15,415 bytes; only intended runtime dependencies, license/readme included, no JS or ASP.NET references.
-- Source preparation assembles42 dependency inventories/notices,46 exact source artifacts including all GPL publication commits, and retained original TinySegmenter notice. An initial archive build succeeds; final clean-commit/Linux source verification follows the implementation commit.
+- Source preparation assembles42 dependency inventories/notices,46 exact source artifacts including all GPL publication commits, and retained original TinySegmenter notice. The source pipeline passes in a plain Linux Node24 container with standard git/tar and no RTK installed. The90.5MB measured archive includes the committed integration source; its embedded Git identity is verified against the implementation commit.
 
 ## Rulings and limitations
 

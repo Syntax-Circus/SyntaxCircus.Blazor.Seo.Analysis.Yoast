@@ -121,6 +121,13 @@
     "nodeVersion": "NODE_VERSION=24.22.0",
     "user": "node"
   },
+  "sourceArchive": {
+    "verifiedPlatform": "Linux Node24 container with standard git/tar and no RTK",
+    "sourceArtifacts": 46,
+    "observedBytes": 90470267,
+    "integrationRevision": "ca635b8",
+    "note": "Measured at implementation commit; subsequent evidence-only commits do not change qualified binaries. Release pipeline archives its own clean HEAD."
+  },
   "observedIdleMemoryMiB": [
     18.5,
     49.82
