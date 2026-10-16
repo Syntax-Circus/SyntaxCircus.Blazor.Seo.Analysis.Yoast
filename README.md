@@ -12,6 +12,17 @@ The original .NET client is MIT. The separately deployed service is GPL-3.0-only
 
 ## Run the service
 
+Released service images are published to
+`ghcr.io/syntax-circus/seo-analysis-yoast:<version>`, using the same version as
+the NuGet package and GitHub release. Use an explicit released version; no
+floating `latest` tag is published. See [container publishing and deployment](docs/container-publishing.md)
+for public-pull verification and the matching source archive. The first GHCR
+release requires the maintainer to make the package Public before anonymous
+pulls pass. Existing release0.1.0 has only an image archive until a registry
+release has completed.
+
+To build locally:
+
 From service/, run npm ci --ignore-scripts. From the repository root:
 
 ```text
@@ -48,7 +59,7 @@ WebAssembly references only the core contracts and calls its authenticated host 
 
 ## Release
 
-GitVersion and build.yml follow sibling trusted-publishing conventions. CI tests the service, packs consumers, runs browser checks and assembles corresponding source. Main releases attach a version-tagged Docker image export and source archive to the same GitHub release as the NuGet version. Load the image with docker load, then deploy privately. Publish core first. Customer deployments must keep source access available for every distributed service version.
+GitVersion and build.yml follow sibling trusted-publishing conventions. CI tests the service, packs consumers, runs browser checks and assembles corresponding source. Main releases attach a version-tagged Docker image export and source archive to the same GitHub release as the NuGet version, then load that tested image and publish its version tag to GHCR. A pull with an empty Docker credential configuration verifies anonymous access. The release job alone has package-write permission; pull requests and feature-branch builds do not publish. Publish core first. Customer deployments must keep source access available for every distributed service version.
 
 Run node scripts/source-archive.mjs from a clean committed checkout before distributing a container. It includes exact npm tarballs, full GPL upstream source archives at recorded publication commits, notices and integration/build source. Do not distribute the image without that source artifact.
 

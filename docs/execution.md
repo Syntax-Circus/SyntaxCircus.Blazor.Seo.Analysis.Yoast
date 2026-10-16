@@ -20,3 +20,38 @@ Approved scope: MIT .NET HTTP client; separately deployed GPL Yoast service; pac
 - A sample rebuild initially encountered the still-running sample host's Windows file locks. Stopping that owned process and rebuilding produced zero warnings/errors.
 - Local audit commands require the temporary core feed/version until the first core release; an unqualified automatic restore cannot find the intentionally unpublished core.
 - No hosted CI, trusted publishing, NuGet release or container publication has executed. The core must publish before this dependent client's ordinary CI restore. No production Puppies Plus integration or deployment was made.
+
+## GHCR publishing follow-up — 2026-10-16
+
+Owner requested public registry distribution and a PR. Branch
+`feature/ghcr-publishing` starts at `aa3461a`, whose main workflow is now observed
+successful and whose release0.1.0 contains image/source archives. Earlier
+unexecuted-release limitations above describe the initial implementation checkpoint.
+
+The existing protected main-push release job now receives package-write permission,
+attaches corresponding source before registry publication, loads the tested image
+archive and pushes its exact NuGet version to
+`ghcr.io/syntax-circus/seo-analysis-yoast:<version>`. No floating latest tag is
+published. An empty Docker credential configuration checks anonymous pulls and
+records the image digest/source link in the run summary. PR/feature builds retain
+read-only permissions and cannot execute that release job. OCI source, license
+and documentation labels accompany the service. First-package Public visibility
+and failed-job rerun steps are documented in container-publishing.md.
+
+Local verification: .NET10 tests pass10/10, Node service tests4/4, zero failures
+or skips. Official actionlint1.7.12 (download checksum verified) accepts the
+complete workflow with ShellCheck disabled. Linux amd64 image build succeeds;
+the actual workflow load/tag Bash block passes syntax and execution checks using
+a qualification version filename and an actual Docker export/load. The GHCR
+reference is lowercased and versioned correctly. Image identity is preserved:
+`sha256:49002b70ccf1c85d3ee99b7a15a1e5f9258ecc4661f2e55544f34c5709b89c6c`.
+OCI labels, nonroot user and architecture checks pass. The owned container's
+health endpoint passes on an isolated network with read-only filesystem and
+dropped capabilities; the container and temporary qualification tags are removed.
+Local evidence is retained under ignored artifacts/ghcr-qualification/.
+
+One fresh read-only review finds no actionable defects. This work does not push
+a registry image, change package visibility, merge, release NuGet or deploy an
+application. Hosted PR checks and actual push/anonymous pull remain to be measured
+after opening the PR and, for publishing, after merge and protected release approval.
+No Puppies Plus configuration is changed by this PR.
