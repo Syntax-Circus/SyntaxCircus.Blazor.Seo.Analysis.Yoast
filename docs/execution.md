@@ -55,3 +55,23 @@ a registry image, change package visibility, merge, release NuGet or deploy an
 application. Hosted PR checks and actual push/anonymous pull remain to be measured
 after opening the PR and, for publishing, after merge and protected release approval.
 No Puppies Plus configuration is changed by this PR.
+
+## Stable latest tag follow-up — 2026-10-16
+
+Owner requested both exact version and `:latest` tags after merging PR2.
+`feature/ghcr-latest` starts at merged `d310684`. Stable releases now push the
+exact version first, tag that same image as `:latest`, and push it. Prereleases
+leave `:latest` unchanged. Anonymous verification and the run summary cover
+every published tag. Documentation explains that `:latest` is mutable, including
+on stable release reruns; exact versions/digests remain available for pinning.
+
+The actual workflow shell first failed a regression because it pushed no latest
+tag. Final seven shell checks pass for stable/prerelease push and anonymous-pull
+selection plus version/latest push failure propagation. Only registry commands
+are stubbed; actual Bash control flow runs. This dependency-free check now runs
+in the normal build after Node setup. Windows CRLF is normalized before parsing.
+Local .NET10 tests10/10 and Node service tests4/4 pass; actionlint1.7.12 and
+whitespace checks pass. Fresh read-only review finds no actionable defects.
+No runtime/image content changes are made; no registry push or deployment is
+performed locally. Hosted CI and actual latest publication are left to the PR
+and protected main release respectively.

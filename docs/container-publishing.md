@@ -3,7 +3,8 @@
 The release job publishes the tested Linux amd64 service image as
 `ghcr.io/syntax-circus/seo-analysis-yoast:<version>`. The version is derived from
 the released NuGet package, matching its GitHub `v<version>` release. Stable and
-prerelease versions both get their exact version tag; neither moves `latest`.
+prerelease versions both get their exact version tag. Stable releases also tag
+and push that same image as `:latest`; prereleases never move `:latest`.
 No new Docker Hub credentials or personal access token are needed: the protected
 release job uses `GITHUB_TOKEN` with `packages: write`.
 
@@ -16,7 +17,7 @@ attaches `yoast-image.tar.gz` and `corresponding-source.tar.gz` before publishin
 the same image to GHCR. It does not rebuild the image in the publishing job.
 The image carries OCI repository, license and documentation labels.
 
-The final step pulls the image with an empty Docker credential configuration.
+The final step pulls every published tag with an empty Docker credential configuration.
 It fails the job if anonymous access is unavailable. A successful step records
 the image reference, registry digest and source-release link in the run summary.
 PRs and feature branches run qualification without executing the release job.
@@ -47,6 +48,10 @@ with `YOAST_VERSION` set to that exact released version:
 ```sh
 docker pull "ghcr.io/syntax-circus/seo-analysis-yoast:$YOAST_VERSION"
 ```
+
+To follow the most recently published stable release instead, pull
+`ghcr.io/syntax-circus/seo-analysis-yoast:latest`. That tag is mutable, including
+when a stable release job is rerun; use an exact version or digest to pin a deployment.
 
 For Compose, set `image` to that reference and allow normal image pulls; remove
 any `pull_policy: never` inherited from archive-only deployments. Deploy on a

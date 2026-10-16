@@ -14,8 +14,9 @@ The original .NET client is MIT. The separately deployed service is GPL-3.0-only
 
 Released service images are published to
 `ghcr.io/syntax-circus/seo-analysis-yoast:<version>`, using the same version as
-the NuGet package and GitHub release. Use an explicit released version; no
-floating `latest` tag is published. See [container publishing and deployment](docs/container-publishing.md)
+the NuGet package and GitHub release. Stable releases also publish `:latest`;
+prereleases publish only their exact version. Pin an explicit version or digest
+when reproducible deployments are required. See [container publishing and deployment](docs/container-publishing.md)
 for public-pull verification and the matching source archive. The first GHCR
 release requires the maintainer to make the package Public before anonymous
 pulls pass. Existing release0.1.0 has only an image archive until a registry
