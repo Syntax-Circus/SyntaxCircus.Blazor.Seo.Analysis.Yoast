@@ -30,6 +30,7 @@ jobs:
           cache-dependency-path: |
             service/package-lock.json
             package-lock.json
+      - run: node scripts/test-container-tags.mjs
       - run: npm ci --ignore-scripts
         working-directory: service
       - run: npm audit --audit-level=moderate
@@ -172,7 +173,14 @@ jobs:
       - name: Publish versioned service image
         env:
           IMAGE: ${{ steps.image.outputs.ref }}
-        run: docker push "$IMAGE"
+        shell: bash
+        run: |
+          docker push "$IMAGE"
+          if [[ "${IMAGE##*:}" != *-* ]]; then
+            latest="${IMAGE%:*}:latest"
+            docker tag "$IMAGE" "$latest"
+            docker push "$latest"
+          fi
 
       - name: Verify public pull without credentials
         env:
@@ -181,13 +189,21 @@ jobs:
         run: |
           anonymous_config=$(mktemp -d)
           trap 'rm -rf "$anonymous_config"' EXIT
-          if ! docker --config "$anonymous_config" pull "$IMAGE"; then
-            echo '::error::Anonymous GHCR pull failed. For a new package, set its visibility to Public in the organization package settings, then rerun this release job. See docs/container-publishing.md.'
-            exit 1
+          images=("$IMAGE")
+          if [[ "${IMAGE##*:}" != *-* ]]; then
+            images+=("${IMAGE%:*}:latest")
           fi
+          for image in "${images[@]}"; do
+            if ! docker --config "$anonymous_config" pull "$image"; then
+              echo '::error::Anonymous GHCR pull failed. For a new package, set its visibility to Public in the organization package settings, then rerun this release job. See docs/container-publishing.md.'
+              exit 1
+            fi
+          done
           {
             echo '### Public Yoast service image'
-            echo "\`docker pull $IMAGE\`"
-            docker image inspect "$IMAGE" --format '{{range .RepoDigests}}{{println .}}{{end}}'
+            for image in "${images[@]}"; do
+              echo "\`docker pull $image\`"
+              docker image inspect "$image" --format '{{range .RepoDigests}}{{println .}}{{end}}'
+            done
             echo "Corresponding source: https://github.com/$GITHUB_REPOSITORY/releases/tag/v${IMAGE##*:}"
           } >> "$GITHUB_STEP_SUMMARY"
