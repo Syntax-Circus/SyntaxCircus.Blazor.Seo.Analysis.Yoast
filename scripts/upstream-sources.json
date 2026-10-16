@@ -1,0 +1,26 @@
+[
+  {
+    "name": "yoastseo",
+    "version": "3.6.0",
+    "repository": "Yoast/wordpress-seo",
+    "commit": "2aa472e84cecf914ff64bc5e48db730d54a6ad63"
+  },
+  {
+    "name": "@yoast/feature-flag",
+    "version": "0.6.0-alpha.2",
+    "repository": "Yoast/wordpress-seo",
+    "commit": "27f75fcea0dc66c01d150e93d7f6b2581e1f1fad"
+  },
+  {
+    "name": "@wordpress/i18n",
+    "version": "6.6.0",
+    "repository": "WordPress/gutenberg",
+    "commit": "2bbe0d34ab65458468758c48826296d7a753428b"
+  },
+  {
+    "name": "@wordpress/hooks",
+    "version": "4.57.0",
+    "repository": "WordPress/gutenberg",
+    "commit": "12441e2520c78b2254a792a8cba40c34110be060"
+  }
+]

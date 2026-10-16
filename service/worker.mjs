@@ -1,0 +1,15 @@
+import {parentPort,workerData as s} from 'node:worker_threads';
+import PaperModule from 'yoastseo/build/values/Paper.js';
+import ResearcherModule from 'yoastseo/build/languageProcessing/languages/en/Researcher.js';
+import SeoModule from 'yoastseo/build/scoring/assessors/seoAssessor.js';
+import ReadabilityModule from 'yoastseo/build/scoring/assessors/contentAssessor.js';
+const unwrap=x=>x.default??x;
+const Paper=unwrap(PaperModule), Researcher=unwrap(ResearcherModule), Seo=unwrap(SeoModule), Readability=unwrap(ReadabilityModule);
+const attributes={title:s.title,description:s.metaDescription,keyword:s.focusPhrase??'',slug:s.slug,permalink:s.canonicalUrl,locale:'en_US',textTitle:s.title,titleWidth:s.title.length*8};
+const paper=new Paper(s.contentHtml,attributes),prose=new Paper(s.readabilityHtml,{...attributes});
+const seo=new Seo(new Researcher(paper)),readability=new Readability(new Researcher(prose));
+seo.assess(paper);readability.assess(prose);
+const map=(assessor,category)=>assessor.getValidResults().map(x=>({id:x.getIdentifier(),score:x.getScore(),category,message:x.getText().replace(/<[^>]*>/gu,'')}));
+const results=[...map(seo,'Other'),...map(readability,'Readability')];
+if(results.some(x=>/An error occurred in the/u.test(x.message)))throw new Error('Assessment failure');
+parentPort.postMessage(results);

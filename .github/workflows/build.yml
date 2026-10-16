@@ -1,0 +1,144 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # GitVersion needs full history, not a shallow clone
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet restore SyntaxCircus.Seo.Analysis.Yoast.slnx
+      - run: dotnet build SyntaxCircus.Seo.Analysis.Yoast.slnx --no-restore --configuration Release
+      - run: dotnet test SyntaxCircus.Seo.Analysis.Yoast.slnx --no-build --configuration Release
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            service/package-lock.json
+            package-lock.json
+      - run: npm ci --ignore-scripts
+        working-directory: service
+      - run: npm audit --audit-level=moderate
+        working-directory: service
+      - run: npm test
+        working-directory: service
+      - run: node scripts/prepare-source.mjs
+      - run: node scripts/source-archive.mjs
+      - run: docker compose up -d --build
+      - name: Pack and exercise consumers
+        shell: bash
+        run: |
+          dotnet pack src/SyntaxCircus.Seo.Analysis.Yoast -c Release -p:DisableGitVersionTask=true -p:Version=0.0.0-qualification -o artifacts/feed
+          dotnet restore samples/Qualification -p:YoastAnalysisVersion=0.0.0-qualification -p:RestoreAdditionalProjectSources="$GITHUB_WORKSPACE/artifacts/feed"
+          dotnet run --project samples/Qualification -c Release --no-restore -p:YoastAnalysisVersion=0.0.0-qualification -- fixtures/owned-inputs.json artifacts/corpus-results.json
+          dotnet restore samples/BlazorHost -p:YoastAnalysisVersion=0.0.0-qualification -p:RestoreAdditionalProjectSources="$GITHUB_WORKSPACE/artifacts/feed"
+          dotnet build samples/BlazorHost -c Release --no-restore -p:YoastAnalysisVersion=0.0.0-qualification
+          SAMPLE_ACCESS_KEY=local-qualification-only ASPNETCORE_URLS=http://127.0.0.1:5090 ASPNETCORE_ENVIRONMENT=Development dotnet run --project samples/BlazorHost -c Release --no-build --no-restore > artifacts/sample.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:5090/login >/dev/null && break; sleep 1; done
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: npm run browser
+      - name: Retain qualification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualification
+          path: |
+            artifacts/browser.json
+            artifacts/corpus-results.json
+            artifacts/*.png
+            artifacts/sample.log
+      - name: Pack
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: dotnet pack SyntaxCircus.Seo.Analysis.Yoast.slnx --configuration Release --output artifacts
+
+      - name: Export versioned service
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          package_path=$(find artifacts -maxdepth 1 -name '*.nupkg' | head -n 1)
+          version=${package_path#artifacts/SyntaxCircus.Seo.Analysis.Yoast.}
+          version=${version%.nupkg}
+          docker tag syntaxcircusseoanalysisyoast-yoast "syntaxcircus/seo-analysis-yoast:$version"
+          docker save "syntaxcircus/seo-analysis-yoast:$version" | gzip > artifacts/yoast-image.tar.gz
+
+      - name: Upload package artifact
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: |
+            artifacts/*.*nupkg
+            artifacts/corresponding-source.tar.gz
+            artifacts/yoast-image.tar.gz
+          retention-days: 7
+
+  publish:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+      id-token: write # enable GitHub OIDC token issuance for NuGet Trusted Publishing
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Download package artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: nuget-package
+          path: artifacts
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+      - name: Publish to NuGet
+        run: dotnet nuget push artifacts/*.nupkg --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Tag published version
+        run: |
+          package_path=$(find artifacts -maxdepth 1 -type f -name '*.nupkg' ! -name '*.snupkg' | head -n 1)
+          if [ -z "$package_path" ]; then
+            echo "No .nupkg found to derive the release tag."
+            exit 1
+          fi
+
+          package_name=$(basename "$package_path")
+          version=${package_name#SyntaxCircus.Seo.Analysis.Yoast.}
+          version=${version%.nupkg}
+          tag="v$version"
+
+          if git ls-remote --tags origin "refs/tags/$tag" | grep -q .; then
+            echo "Tag $tag already exists on origin."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$tag" "$GITHUB_SHA"
+          git push origin "$tag"
+
+      - name: Attach service and source to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          package_path=$(find artifacts -maxdepth 1 -name '*.nupkg' | head -n 1)
+          version=${package_path#artifacts/SyntaxCircus.Seo.Analysis.Yoast.}
+          version=${version%.nupkg}
+          tag="v$version"
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --target "$GITHUB_SHA" --generate-notes
+          gh release upload "$tag" artifacts/corresponding-source.tar.gz artifacts/yoast-image.tar.gz --clobber

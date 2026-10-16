@@ -1,0 +1,1 @@
+<Project><ItemGroup Condition="'$(SeoAnalysisVersion)' != ''"><PackageVersion Update="SyntaxCircus.Seo.Analysis" Version="$(SeoAnalysisVersion)"/></ItemGroup></Project>

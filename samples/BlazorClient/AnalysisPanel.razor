@@ -1,0 +1,21 @@
+@implements IDisposable
+<h1>Content analysis sample</h1>
+<label for="content">Article HTML</label>
+<textarea id="content" rows="8" value="@Content" @oninput="ContentChanged"></textarea>
+<button @onclick="AnalyzeAsync">Analyze</button>
+<p role="status">@Status</p>
+@if (Report is not null)
+{
+    <ul id="findings">
+    @foreach (var finding in Report.Findings)
+    {
+        <li>@finding.Source: @finding.Message <span>@finding.Recommendation</span></li>
+    }
+    </ul>
+    <ul id="coverage">
+    @foreach (var coverage in Report.Coverage)
+    {
+        <li>@coverage.Provider: @coverage.State</li>
+    }
+    </ul>
+}
