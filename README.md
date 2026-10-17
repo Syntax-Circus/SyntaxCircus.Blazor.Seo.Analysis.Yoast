@@ -17,10 +17,8 @@ Released service images are published to
 the NuGet package and GitHub release. Stable releases also publish `:latest`;
 prereleases publish only their exact version. Pin an explicit version or digest
 when reproducible deployments are required. See [container publishing and deployment](docs/container-publishing.md)
-for public-pull verification and the matching source archive. The first GHCR
-release requires the maintainer to make the package Public before anonymous
-pulls pass. Existing release0.1.0 has only an image archive until a registry
-release has completed.
+for public-pull verification and the matching source archive. Registry images
+exist from 0.1.1 onward; release 0.1.0 has only an image archive.
 
 To build locally:
 
@@ -48,7 +46,7 @@ Protocol1: POST v1/analyze with a snapshot and protocolVersion; result echoes sn
 
 ## Samples and qualification
 
-The core0.1.0 package must be available before restoring this repository normally. For unreleased development, pack core into a local feed and override SeoAnalysisVersion. Pack this client, then restore samples against that feed using YoastAnalysisVersion. No source-project reference substitutes for the package boundary.
+The core 0.1.0 package, published on nuget.org, is what this repository restores normally. For unreleased development, pack core into a local feed and override SeoAnalysisVersion. Pack this client, then restore samples against that feed using YoastAnalysisVersion. No source-project reference substitutes for the package boundary.
 
 - samples/Qualification: actual .NET → HTTP → Yoast → .NET analysis. Run with fixtures/owned-inputs.json and an evidence output path.
 - samples/BlazorHost: Server and WebAssembly paths. Build with the chosen package versions, set SAMPLE_ACCESS_KEY and ASPNETCORE_URLS, then run. Visit /login, then /server or /wasm. The sample key is a local demonstration, not a production identity system.
@@ -64,4 +62,4 @@ GitVersion and build.yml follow sibling trusted-publishing conventions. CI tests
 
 Run node scripts/source-archive.mjs from a clean committed checkout before distributing a container. It includes exact npm tarballs, full GPL upstream source archives at recorded publication commits, notices and integration/build source. Do not distribute the image without that source artifact.
 
-Power SEO/retext browser adapters and browser-side Yoast remain future work. Puppies Plus production integration is separate. See docs/execution.md for measured evidence and limitations.
+The Power SEO browser companion is published separately as [SyntaxCircus.Blazor.Seo.Analysis.PowerSeo](https://github.com/Syntax-Circus/SyntaxCircus.Blazor.Seo.Analysis.PowerSeo) (NuGet 0.1.0). retext browser adapters and browser-side Yoast remain future work. Puppies Plus production integration is separate. See docs/execution.md for measured evidence and limitations.
